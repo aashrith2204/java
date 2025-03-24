@@ -1,0 +1,131 @@
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+@WebServlet("/insertData")
+public class insertdata extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        
+        String url = "jdbc:mysql://localhost:3306/student";
+        String user = "root";
+        String password = "root";
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(url, user, password);
+            
+            String sql = "INSERT INTO mark (rollno, name, section, s1, s2, s3, s4, s5, l1, l2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement st = con.prepareStatement(sql);
+            
+            st.setInt(1, Integer.parseInt(request.getParameter("rollno")));
+            st.setString(2, request.getParameter("name"));
+            st.setString(3, request.getParameter("section"));
+            st.setInt(4, Integer.parseInt(request.getParameter("s1")));
+            st.setInt(5, Integer.parseInt(request.getParameter("s2")));
+            st.setInt(6, Integer.parseInt(request.getParameter("s3")));
+            st.setInt(7, Integer.parseInt(request.getParameter("s4")));
+            st.setInt(8, Integer.parseInt(request.getParameter("s5")));
+            st.setInt(9, Integer.parseInt(request.getParameter("l1")));
+            st.setInt(10, Integer.parseInt(request.getParameter("l2")));
+
+            int result = st.executeUpdate();
+            
+            if (result > 0) {
+                out.println("<html><body><h3>Data Inserted Successfully!</h3></body></html>");
+            } else {
+                out.println("<html><body><h3>Failed to Insert Data</h3></body></html>");
+            }
+
+            st.close();
+            con.close();
+        } catch (Exception e) {
+            out.println("<html><body><h3>Error: " + e.getMessage() + "</h3></body></html>");
+        } finally {
+            out.close();
+        }
+    }
+}
+
+
+
+
+
+index.html:
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Student Marks Entry</title>
+</head>
+<body>
+
+<h2>Enter Student Marks</h2>
+
+<form action="insertData" method="post">
+<table>
+<tr>
+    <td>Enter Roll No :</td>
+    <td><input type="text" name="rollno" required /></td>
+</tr>
+<tr>
+    <td>Enter Name :</td>
+    <td><input type="text" name="name" required /></td>
+</tr>
+<tr>
+    <td>Enter Section :</td>
+    <td>
+        <select name="section">
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+        </select>
+    </td>
+</tr>
+<tr>
+    <td>Enter Subject1 Mark :</td>
+    <td><input type="number" name="s1" required /></td>
+</tr>
+<tr>
+    <td>Enter Subject2 Mark :</td>
+    <td><input type="number" name="s2" required /></td>
+</tr>
+<tr>
+    <td>Enter Subject3 Mark :</td>
+    <td><input type="number" name="s3" required /></td>
+</tr>
+<tr>
+    <td>Enter Subject4 Mark :</td>
+    <td><input type="number" name="s4" required /></td>
+</tr>
+<tr>
+    <td>Enter Subject5 Mark :</td>
+    <td><input type="number" name="s5" required /></td>
+</tr>
+<tr>
+    <td>Enter Lab1 Mark :</td>
+    <td><input type="number" name="l1" required /></td>
+</tr>
+<tr>
+    <td>Enter Lab2 Mark :</td>
+    <td><input type="number" name="l2" required /></td>
+</tr>
+<tr>
+    <td colspan="2"><input type="submit" value="Submit" /></td>
+</tr>
+</table>
+</form>
+
+</body>
+</html>
